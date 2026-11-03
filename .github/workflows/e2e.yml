@@ -22,7 +22,7 @@ jobs:
           npm install --no-save @playwright/test@1.56.1
           npx playwright install --with-deps chromium
       - name: Run E2E against public GitHub Pages
-        run: npx playwright test tests/e2e.spec.js --project=chromium --reporter=line --workers=1
+        run: npx playwright test tests/e2e.spec.js --browser=chromium --reporter=line --workers=1
       - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4
