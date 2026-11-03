@@ -12,6 +12,7 @@
 
   let toastTimer;
   let saveTimer;
+  let wasCleared = false;
 
   const storage = {
     read() {
@@ -56,6 +57,7 @@
 
   function save({ silent = true } = {}) {
     const ok = storage.write(collectData());
+    if (ok) wasCleared = false;
     saveStatus.textContent = ok
       ? `Salvo neste dispositivo em ${formatSavedAt()}.`
       : 'Não foi possível salvar neste navegador. Gere o PDF para manter uma cópia.';
@@ -78,6 +80,7 @@
   }
 
   function scheduleSave() {
+    wasCleared = false;
     updateProgress();
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => save({ silent: true }), 500);
@@ -94,7 +97,12 @@
   document.getElementById('clearButton').addEventListener('click', () => {
     const confirmed = window.confirm('Apagar todas as respostas salvas neste dispositivo? Esta ação não pode ser desfeita.');
     if (!confirmed) return;
-    storage.clear();
+    clearTimeout(saveTimer);
+    if (!storage.clear()) {
+      notify('Não foi possível apagar os dados neste navegador.');
+      return;
+    }
+    wasCleared = true;
     fields.forEach((field) => {
       if (field.type === 'checkbox') field.checked = false;
       else field.value = '';
@@ -115,7 +123,7 @@
       else if (navigator.clipboard) {
         await navigator.clipboard.writeText(window.location.href);
         notify('Link copiado.');
-      }
+      } else notify('Compartilhamento indisponível. Copie o endereço da página.');
     } catch (error) {
       if (error?.name !== 'AbortError') notify('Não foi possível compartilhar automaticamente.');
     }
@@ -315,6 +323,8 @@
   }
 
   document.getElementById('pdfButton').addEventListener('click', generatePdf);
-  window.addEventListener('pagehide', () => save({ silent: true }));
+  window.addEventListener('pagehide', () => {
+    if (!wasCleared) save({ silent: true });
+  });
   load();
 })();
