@@ -133,14 +133,23 @@ test('10 accordions, iframes de recursos e links', async ({ page }) => {
     await expect(panels.nth(i)).not.toHaveAttribute('open', '');
   }
 });
-test('11 preenchimento nao transmite respostas em requisicoes POST', async ({ page }) => {
-  const posts = [];
-  page.on('request', req => { if(req.method() === 'POST') posts.push(req.url()); });
+test('11 preenchimento permanece local e nao vaza em requisicoes', async ({ page }) => {
+  const marker = 'CONTEUDO TESTE NAO SENSIVEL';
+  const siteOrigin = new URL(SITE).origin;
+  const ownPosts = [];
+  const leaks = [];
+  page.on('request', req => {
+    if (req.method() === 'POST' && new URL(req.url()).origin === siteOrigin) ownPosts.push(req.url());
+    if ((req.url() + ' ' + (req.postData() || '')).includes(marker)) leaks.push(req.url());
+  });
   await open(page);
-  await page.fill('#rede', 'CONTEUDO TESTE NAO SENSIVEL');
+  await page.fill('#rede', marker);
   await page.locator('#saveButton').click();
   await page.waitForTimeout(650);
-  expect(posts).toEqual([]);
+  const saved = await page.evaluate(k => JSON.parse(localStorage.getItem(k)).rede, STORAGE);
+  expect(saved).toBe(marker);
+  expect(ownPosts).toEqual([]);
+  expect(leaks).toEqual([]);
 });
 for (const width of [360,390,768]) {
   test('12 responsividade sem overflow em ' + width + 'px', async ({ page }) => {
