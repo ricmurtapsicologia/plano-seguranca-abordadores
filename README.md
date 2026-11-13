@@ -40,8 +40,8 @@ O `<head>` contém metadados Open Graph e Twitter Card para que WhatsApp, Facebo
 
 - **Título social:** `Plano de Segurança do Abordador | GTO ATS`
 - **Descrição social:** material de apoio ao abordador do GTO ATS
-- **Imagem social atual:** `https://i.pinimg.com/736x/55/bc/eb/55bceb38f978b7d0c9d4eaf64054ccfb.jpg`
-- **Origem da imagem:** referência já utilizada no repositório `Curso-ATS`, no conteúdo “Encontro 2: Abordagem Técnica”
+- **Imagem social atual:** `https://i.pinimg.com/originals/8b/f8/ff/8bf8ff364dc447b4e60a9e8d92acbba3.jpg`
+- **Origem da imagem:** mesma imagem Open Graph utilizada em `Inicio-de-Jornada-Terapeutica`
 - **Formato:** JPEG via HTTPS
 
 A imagem social é uma dependência externa. Para máxima previsibilidade de cache e disponibilidade, a arquitetura preferencial futura é hospedar uma imagem própria do projeto em `assets/og-plano-seguranca-abordador.jpg` e apontar `og:image` para o mesmo domínio do GitHub Pages.
