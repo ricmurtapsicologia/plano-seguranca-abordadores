@@ -154,3 +154,17 @@ for (const width of [360,390,768]) {
     await expect(page.getByRole('link', { name: /CVV 188/ })).toBeVisible();
   });
 }
+
+test('13 previsualizacao WhatsApp reutiliza imagem da Jornada Terapeutica', async ({ page, request }) => {
+  const jornada = await request.get('https://ricmurtapsicologia.github.io/Inicio-de-Jornada-Terapeutica/');
+  expect(jornada.ok()).toBeTruthy();
+  const sourceHtml = await jornada.text();
+  const match = sourceHtml.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+  expect(match).not.toBeNull();
+  const expected = match[1];
+  await open(page);
+  for (const selector of ['meta[property="og:image"]', 'meta[property="og:image:secure_url"]', 'meta[name="twitter:image"]']) {
+    await expect(page.locator(selector)).toHaveAttribute('content', expected);
+  }
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Plano de Segurança do Abordador/);
+});
